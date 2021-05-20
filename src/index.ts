@@ -1,8 +1,24 @@
 import * as express from "express";
 import * as dotenv from "dotenv";
 import * as bodyParser from "body-parser";
+import * as mongoose from 'mongoose';
+import { saveTag } from "./models/Tag";
 
 dotenv.config();
+
+const mongoUrl = process.env.MONGO_URI;
+
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const db = mongoose.connection;
+
+db.once('open', _ => {
+  console.log('Database connected:', mongoUrl)
+});
+
+saveTag({title: 'test2', color: 'yellow'}).catch(err => {
+  console.log(err)
+});
 
 declare namespace Express {
   export interface Request {
@@ -67,7 +83,7 @@ app.use(bodyParser.json());
 
 app.post("/name", function(req, res) {
   const { body: {first, last} } = req;
-  const name = `${first} ${last}`
+  const name = `${first} ${last}`;
   res.json({ name });
 });
 
